@@ -12,6 +12,7 @@ import pl.psi.creatures.Creature;
 public class GameEngine {
 
     public static final String CREATURE_MOVED = "CREATURE_MOVED";
+    public static final String CREATURE_ATTACKED = "CREATURE_ATTACKED";
     private final TurnQueue turnQueue;
     private final Board board;
     private final PropertyChangeSupport observerSupport = new PropertyChangeSupport(this);
@@ -25,6 +26,7 @@ public class GameEngine {
         board.getCreature(point)
                 .ifPresent(defender -> turnQueue.getCurrentCreature()
                         .attack(defender));
+        observerSupport.firePropertyChange(CREATURE_ATTACKED, null, null);
         pass();
     }
 
@@ -35,6 +37,7 @@ public class GameEngine {
     public void move(final Point aPoint) {
         board.move(turnQueue.getCurrentCreature(), aPoint);
         observerSupport.firePropertyChange(CREATURE_MOVED, null, aPoint);
+        pass();
     }
 
     public Optional<Creature> getCreature(final Point aPoint) {

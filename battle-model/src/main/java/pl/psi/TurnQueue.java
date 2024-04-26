@@ -5,6 +5,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,6 +22,7 @@ public class TurnQueue {
     private final Queue<Creature> creaturesQueue;
     private final PropertyChangeSupport observerSupport = new PropertyChangeSupport(this);
     private Creature currentCreature;
+    private Creature oldCreature;
     private int roundNumber;
 
     public TurnQueue(final Collection<Creature> aCreatureList,
@@ -41,10 +43,37 @@ public class TurnQueue {
         return currentCreature;
     }
 
+    public Creature getOldCreature() {
+        return oldCreature;
+    }
+
     public void next() {
-        Creature oldCreature = currentCreature;
+        if (oldCreature != null && currentCreature != null){
+            if (currentCreature.getMorale() > 0 && currentCreature.isExtraTurn()){
+                observerSupport.firePropertyChange(NEXT_CREATURE, oldCreature, currentCreature);
+                return;
+            }
+        }
+
+        oldCreature = currentCreature;
+
         if (creaturesQueue.isEmpty()) {
             endOfTurn();
+        }
+        
+        currentCreature = creaturesQueue.peek();
+        currentCreature.setExtraTurn(false);
+
+        float moraleChance = currentCreature.getMoralePercentage();
+
+        if (currentCreature.getMorale() < 0){
+            Random random = new Random();
+            float randomFloat = random.nextFloat() * 100;
+            if (moraleChance > randomFloat){
+                currentCreature = creaturesQueue.poll();
+                next();
+                return;
+            }
         }
         currentCreature = creaturesQueue.poll();
         observerSupport.firePropertyChange(NEXT_CREATURE, oldCreature, currentCreature);

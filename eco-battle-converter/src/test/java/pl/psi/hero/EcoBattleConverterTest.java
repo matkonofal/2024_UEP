@@ -32,37 +32,37 @@ class EcoBattleConverterTest {
         assertEquals("Skeleton", convertedCreatures.get(0)
                 .getName());
         assertEquals(1, convertedCreatures.get(0)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Walking Dead", convertedCreatures.get(1)
                 .getName());
         assertEquals(2, convertedCreatures.get(1)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Wight", convertedCreatures.get(2)
                 .getName());
         assertEquals(3, convertedCreatures.get(2)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Vampire", convertedCreatures.get(3)
                 .getName());
         assertEquals(4, convertedCreatures.get(3)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Lich", convertedCreatures.get(4)
                 .getName());
         assertEquals(5, convertedCreatures.get(4)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Black Knight", convertedCreatures.get(5)
                 .getName());
         assertEquals(6, convertedCreatures.get(5)
-                .getAmount());
+                .getStats().getTier());
 
         assertEquals("Bone Dragon", convertedCreatures.get(6)
                 .getName());
         assertEquals(7, convertedCreatures.get(6)
-                .getAmount());
+                .getStats().getTier());
     }
 
 }

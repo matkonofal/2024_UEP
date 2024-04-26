@@ -177,4 +177,5 @@ public class CreatureTest {
         turnQueue.next();
         assertThat(selfHealAfterEndOfTurnCreature.getCurrentHp()).isEqualTo(100);
     }
+
 }

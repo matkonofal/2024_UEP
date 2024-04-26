@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pl.psi.creatures.Creature;
 import pl.psi.creatures.NecropolisFactory;
 
 public class Start extends Application
@@ -48,13 +49,17 @@ public class Start extends Application
 
     private Hero createP2()
     {
-        final Hero ret = new Hero( List.of( new NecropolisFactory().create( true, 1, 5 ) ) );
+        final Hero ret = new Hero( List.of( new NecropolisFactory().create( true, 1, 5 ) ), 2, 2 );
+        ret.changeHeroStatistic("morale", 0);
         return ret;
     }
 
     private Hero createP1()
     {
-        final Hero ret = new Hero( List.of( new NecropolisFactory().create( false, 1, 5 ) ) );
+        Creature creature = new NecropolisFactory().create(false, 5, 2);
+        Creature secondCreature = new NecropolisFactory().create(false, 3, 7);        
+        final Hero ret = new Hero( List.of( creature, secondCreature), 2, 2 );
+        ret.changeHeroStatistic("morale", -3);
         return ret;
     }
 

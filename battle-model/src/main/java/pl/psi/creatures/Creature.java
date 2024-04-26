@@ -28,6 +28,16 @@ public class Creature implements PropertyChangeListener {
     private int currentHp;
     private int counterAttackCounter = 1;
     private DamageCalculatorIf calculator;
+    private int movementRange;
+    @Setter
+    private int heroAttackModifier = 0;
+    @Setter
+    private int heroArmorModifier = 0;
+    @Setter
+    private int luck = 0;
+    @Setter
+    private int morale = 0;
+    private boolean ExtraTurn = false;
 
     Creature() {
     }
@@ -38,15 +48,73 @@ public class Creature implements PropertyChangeListener {
         amount = aAmount;
         currentHp = stats.getMaxHp();
         calculator = aCalculator;
+        movementRange = stats.getMoveRange();
+    }
+
+    public boolean hasExtraTurn(){
+        return ExtraTurn;
+    }
+
+    public void setExtraTurn(boolean boo){
+        ExtraTurn = boo;
+    }
+
+    public float getLuckPercentage(){
+        float chance = 0f;
+        if (getLuck() > 0){
+            chance = (float) getLuck() * 100 / 24;
+            if (getLuck() > 3){
+                return (float) 300/24;
+            }
+        }
+        return chance;
+    }
+
+    public float getMoralePercentage(){
+        float chance = 0f;
+        if (getMorale() > 0){
+            chance = (float) getMorale() * 100 / 24;
+            if (getMorale() > 3){
+                return (float) 300/24;
+            }
+        } else if (getMorale() < 0){
+            chance = Math.abs((float) getMorale()) * 100 / 12;
+            if (getMorale() < -3){
+                return (float) 300/12;
+            }
+        }
+        return chance;
+    }
+
+    public void decideIfExtraAttack(){
+        Random random = new Random();
+        float randomFloat = random.nextFloat() * 100;
+        System.out.println(randomFloat);
+        System.out.println(getMoralePercentage());
+
+        if (randomFloat > getMoralePercentage()){
+            setExtraTurn(false);
+        } else {
+            setExtraTurn(true);
+        }
     }
 
     public void attack(final Creature aDefender) {
         if (isAlive()) {
-            final int damage = getCalculator().calculateDamage(this, aDefender);
+            int damage = getCalculator().calculateDamage(this, aDefender);
+
+            Random random = new Random();
+            float randomFloat = random.nextFloat() * 100;
+
+            if (getLuckPercentage() > randomFloat){
+                damage *= 2;
+            }
+            
             applyDamage(aDefender, damage);
             if (canCounterAttack(aDefender)) {
                 counterAttack(aDefender);
             }
+            decideIfExtraAttack();
         }
     }
 
@@ -93,11 +161,19 @@ public class Creature implements PropertyChangeListener {
     }
 
     int getAttack() {
-        return stats.getAttack();
+        return stats.getAttack() + heroAttackModifier;
+    }
+
+    public int getModifiedAttack() {
+        return stats.getAttack() + heroAttackModifier;
     }
 
     int getArmor() {
-        return stats.getArmor();
+        return stats.getArmor() + heroArmorModifier;
+    }
+
+    public int getModifiedArmor() {
+        return stats.getArmor() + heroArmorModifier;
     }
 
     @Override
@@ -116,7 +192,19 @@ public class Creature implements PropertyChangeListener {
     }
 
     public int getMoveRange() {
-        return stats.getMoveRange();
+        if (hasExtraTurn()){
+            return 0;
+        } else {
+            return movementRange;
+        }
+    }
+
+    public int getLuck(){
+        return luck;
+    }
+
+    public int getMorale(){
+        return morale;
     }
 
     public static class Builder {
@@ -147,5 +235,24 @@ public class Creature implements PropertyChangeListener {
     @Override
     public String toString() {
         return getName() + System.lineSeparator() + getAmount();
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj){
+            return true;
+        }
+
+        if (!(obj instanceof Creature)){
+            return false;
+        }
+
+        Creature comparedObj = (Creature) obj;
+
+        return (comparedObj.getAmount() == this.getAmount()
+                && comparedObj.getStats() == this.getStats()
+                && comparedObj.getName() == this.getName()
+                && comparedObj.getMorale() == this.getMorale()
+                && comparedObj.getLuck() == this.getLuck());
     }
 }
